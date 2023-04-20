@@ -17,9 +17,14 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String number;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "room", fetch = FetchType.LAZY)
     private PhoneRepair phoneRepair;
     @ManyToMany(mappedBy = "rooms")
     private Set<Sender> senders;
+
+    public void setPhoneRepair(PhoneRepair phoneRepair){
+        this.phoneRepair = phoneRepair;
+        phoneRepair.setRoom(this);
+    }
 
 }

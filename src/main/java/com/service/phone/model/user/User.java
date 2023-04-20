@@ -29,7 +29,9 @@ public class User {
     private String email;
     @EqualsAndHashCode.Include
     private String password;
+    @EqualsAndHashCode.Include
     private String role;
+    @EqualsAndHashCode.Include
     private String[] authorities;
     @OneToMany(
             mappedBy = "customer",

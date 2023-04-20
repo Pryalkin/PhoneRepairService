@@ -26,15 +26,16 @@ public class PhoneRepair {
     @ManyToOne(fetch = FetchType.LAZY)
     private PhoneRepairRequest phoneRepairRequest;
     private String status;
-    @OneToMany(
-            mappedBy = "phoneRepair",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<Room> rooms = new HashSet<>();
+//    @OneToMany(
+//            mappedBy = "phoneRepair",
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
+//    )
+    @OneToOne(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Room room;
 
-    public void addRoom(Room room){
-        rooms.add(room);
-        room.setPhoneRepair(this);
-    }
+//    public void addRoom(Room room){
+//        rooms.add(room);
+//        room.setPhoneRepair(this);
+//    }
 }

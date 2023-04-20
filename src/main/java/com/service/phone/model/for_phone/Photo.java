@@ -14,6 +14,7 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @EqualsAndHashCode.Include
     private String urlPhoto;
     @ManyToOne(fetch = FetchType.LAZY)
     private PhoneRepairRequest phoneRepairRequest;
