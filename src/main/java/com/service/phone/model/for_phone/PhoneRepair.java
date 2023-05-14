@@ -3,6 +3,8 @@ package com.service.phone.model.for_phone;
 import com.service.phone.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -31,7 +33,8 @@ public class PhoneRepair {
 //            cascade = CascadeType.ALL,
 //            orphanRemoval = true
 //    )
-    @OneToOne(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "phoneRepair", cascade = CascadeType.ALL)
+    @LazyToOne(LazyToOneOption.NO_PROXY)
     private Room room;
 
 //    public void addRoom(Room room){

@@ -18,8 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static com.service.phone.constant.UserImplConstant.*;
-import static com.service.phone.enumeration.Role.ROLE_ADMIN;
-import static com.service.phone.enumeration.Role.ROLE_USER;
+import static com.service.phone.enumeration.Role.*;
 
 @AllArgsConstructor
 @Service
@@ -47,8 +46,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setEmail(userDTO.getEmail());
         user.setPassword(encodePassword(userDTO.getPassword()));
         if (userRepository.findAll().isEmpty()) {
-            user.setRole(ROLE_ADMIN.name());
-            user.setAuthorities(ROLE_ADMIN.getAuthorities());
+            user.setRole(ROLE_ENGINEER.name());
+            user.setAuthorities(ROLE_ENGINEER.getAuthorities());
         } else {
             user.setRole(ROLE_USER.name());
             user.setAuthorities(ROLE_USER.getAuthorities());

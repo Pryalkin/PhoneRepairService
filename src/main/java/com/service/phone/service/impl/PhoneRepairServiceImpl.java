@@ -69,9 +69,10 @@ public class PhoneRepairServiceImpl implements PhoneRepairService {
             phoneRepairAnswerDTO.setEngineer(p.getEngineer().getUsername());
             PhoneRepairRequestAnswerDTO phoneRepairRequestAnswerDTO = new PhoneRepairRequestAnswerDTO();
             phoneRepairRequestAnswerDTO.setPhoneNumber(p.getPhoneRepairRequest().getPhoneNumber());
+            phoneRepairRequestAnswerDTO.setIdApp(p.getPhoneRepairRequest().getIdApp());
             phoneRepairRequestAnswerDTO.setCauseOfFailure(p.getPhoneRepairRequest().getCauseOfFailure());
             phoneRepairRequestAnswerDTO.setDateOfRequestForPhoneRepair(p.getPhoneRepairRequest().getDateOfRequestForPhoneRepair());
-            phoneRepairRequestAnswerDTO.getAllPhoto(p.getPhoneRepairRequest().getPhotos().stream().map(Photo::getUrlPhoto).collect(Collectors.toSet()));
+            phoneRepairRequestAnswerDTO.setAllPhoto(p.getPhoneRepairRequest().getPhotos().stream().map(Photo::getUrlPhoto).collect(Collectors.toSet()));
             UserAnswerDTO customer = new UserAnswerDTO();
             customer.setUsername(p.getPhoneRepairRequest().getCustomer().getUsername());
             customer.setEmail(p.getPhoneRepairRequest().getCustomer().getEmail());

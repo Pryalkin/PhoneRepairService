@@ -8,7 +8,9 @@ import com.service.phone.service.PhoneRepairRequestService;
 import com.service.phone.utility.JWTTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static com.service.phone.constant.HttpAnswer.APPLICATION_SUCCESSFULLY_SENT;
+import static com.service.phone.constant.SecurityConstant.TOKEN_PREFIX;
 import static com.service.phone.controller.security.ValidUsernameSecurity.checkUsernameForValidity;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -41,8 +44,30 @@ public class PhoneRepairRequestController extends ExceptionHandling {
         return HttpAnswer.response(CREATED, APPLICATION_SUCCESSFULLY_SENT);
     }
 
-    @GetMapping("/get/inactive")
-    public ResponseEntity<Set<PhoneRepairRequestAnswerDTO>> registration() {
-        return new ResponseEntity<>(phoneRepairRequestService.getInactive(), OK);
+    @GetMapping("/engineer/get/inactive")
+    @PreAuthorize("hasAnyAuthority('user:get_inactive')")
+    public ResponseEntity<Set<PhoneRepairRequestAnswerDTO>> getInactiveForEngineer() {
+        return new ResponseEntity<>(phoneRepairRequestService.getInactiveForEngineer(), OK);
+    }
+
+    @GetMapping("/user/get/inactive")
+    public ResponseEntity<Set<PhoneRepairRequestAnswerDTO>> getInactive(HttpServletRequest request) {
+        return new ResponseEntity<>(phoneRepairRequestService.getInactive(getUsernameWithToken(request)), OK);
+    }
+
+    @GetMapping("/user/get/active")
+    public ResponseEntity<Set<PhoneRepairRequestAnswerDTO>> getActive(HttpServletRequest request) {
+        return new ResponseEntity<>(phoneRepairRequestService.getActive(getUsernameWithToken(request)), OK);
+    }
+
+    @GetMapping("/user/get/details/{idApp}")
+    public ResponseEntity<PhoneRepairRequestAnswerDTO> getDetail(@PathVariable String idApp) {
+        return new ResponseEntity<>(phoneRepairRequestService.getDetails(idApp), OK);
+    }
+
+    private String getUsernameWithToken(HttpServletRequest request){
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = authorizationHeader.substring(TOKEN_PREFIX.length());
+        return jwtTokenProvider.getSubject(token);
     }
 }

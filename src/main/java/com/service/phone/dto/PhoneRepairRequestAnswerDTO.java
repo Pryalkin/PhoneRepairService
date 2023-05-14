@@ -10,13 +10,14 @@ import java.util.Set;
 @Data
 public class PhoneRepairRequestAnswerDTO {
 
+    private String idApp;
     private String phoneNumber;
     private String causeOfFailure;
     private Set<String> photos = new HashSet<>();
     private UserAnswerDTO customer;
     private LocalDateTime dateOfRequestForPhoneRepair;
 
-    public void getAllPhoto(Set<String> photos){
+    public void setAllPhoto(Set<String> photos){
         photos.addAll(photos);
     }
 

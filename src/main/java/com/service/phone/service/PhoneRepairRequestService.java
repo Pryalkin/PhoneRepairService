@@ -12,7 +12,13 @@ import java.util.Set;
 public interface PhoneRepairRequestService {
     void create(String phoneNumber, String causeOfFailure, String username, MultipartFile photo1, MultipartFile photo2, MultipartFile photo3) throws UsernameExistException, IOException;
 
-    Set<PhoneRepairRequestAnswerDTO> getInactive();
+    Set<PhoneRepairRequestAnswerDTO> getInactiveForEngineer();
 
     PhoneRepairRequest findByPhoneNumber(String phoneNumber) throws PhoneNumberDoesNotExistException;
+
+    Set<PhoneRepairRequestAnswerDTO> getInactive(String username);
+
+    Set<PhoneRepairRequestAnswerDTO> getActive(String username);
+
+    PhoneRepairRequestAnswerDTO getDetails(String idApp);
 }

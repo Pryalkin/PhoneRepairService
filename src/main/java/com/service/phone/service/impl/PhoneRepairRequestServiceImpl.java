@@ -11,6 +11,7 @@ import com.service.phone.repository.PhoneRepairRequestRepository;
 import com.service.phone.service.PhoneRepairRequestService;
 import com.service.phone.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService {
 
     private final PhoneRepairRequestRepository phoneRepairRequestRepository;
@@ -43,6 +45,11 @@ public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService 
         User customer = userService.findByUsername(username);
         PhoneRepairRequest phoneRepairRequest = new PhoneRepairRequest();
         phoneRepairRequest.setPhoneNumber(phoneNumber);
+        String idApp = generateName();
+        while(phoneRepairRequestRepository.findByIdApp(idApp).isPresent()){
+            idApp = generateName();
+        }
+        phoneRepairRequest.setIdApp(idApp);
         phoneRepairRequest.setCauseOfFailure(causeOfFailure);
         phoneRepairRequest.setCustomer(customer);
         phoneRepairRequest = savePhoto(username, photo1, phoneRepairRequest);
@@ -53,32 +60,41 @@ public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService 
     }
 
     @Override
-    public Set<PhoneRepairRequestAnswerDTO> getInactive() {
+    public Set<PhoneRepairRequestAnswerDTO> getInactiveForEngineer() {
         Set<PhoneRepairRequest> phoneRepairRequests = phoneRepairRequestRepository.findAll()
                 .stream().filter(p -> p.getPhoneRepairs() != null)
                 .collect(Collectors.toSet());
-        Set<PhoneRepairRequestAnswerDTO> phoneRepairRequestAnswerDTOs = new HashSet<>();
-        phoneRepairRequests.forEach(p -> {
-            PhoneRepairRequestAnswerDTO phoneRepairRequestAnswerDTO = new PhoneRepairRequestAnswerDTO();
-            phoneRepairRequestAnswerDTO.setPhoneNumber(p.getPhoneNumber());
-            phoneRepairRequestAnswerDTO.setCauseOfFailure(p.getCauseOfFailure());
-            phoneRepairRequestAnswerDTO.setDateOfRequestForPhoneRepair(p.getDateOfRequestForPhoneRepair());
-            phoneRepairRequestAnswerDTO.getAllPhoto(p.getPhotos().stream().map(Photo::getUrlPhoto).collect(Collectors.toSet()));
-            UserAnswerDTO userAnswerDTO = new UserAnswerDTO();
-            userAnswerDTO.setUsername(p.getCustomer().getUsername());
-            userAnswerDTO.setEmail(p.getCustomer().getEmail());
-            userAnswerDTO.setRole(p.getCustomer().getRole());
-            userAnswerDTO.setAuthorities(p.getCustomer().getAuthorities());
-            phoneRepairRequestAnswerDTO.setCustomer(userAnswerDTO);
-            phoneRepairRequestAnswerDTOs.add(phoneRepairRequestAnswerDTO);
-        });
-        return phoneRepairRequestAnswerDTOs;
+        return createPhoneRepairRequestAnswerDTOs(phoneRepairRequests);
+
     }
 
     @Override
     public PhoneRepairRequest findByPhoneNumber(String phoneNumber) throws PhoneNumberDoesNotExistException {
         return phoneRepairRequestRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneNumberDoesNotExistException(THIS_PHONE_NUMBER_DOES_NOT_EXIST));
+    }
+
+    @Override
+    public Set<PhoneRepairRequestAnswerDTO> getInactive(String username) {
+        Set<PhoneRepairRequest> phoneRepairRequests = phoneRepairRequestRepository.findByCustomerUsername(username)
+                .stream()
+                .filter(p -> p.getPhoneRepairs() != null)
+                .collect(Collectors.toSet());
+        return createPhoneRepairRequestAnswerDTOs(phoneRepairRequests);
+    }
+
+    @Override
+    public Set<PhoneRepairRequestAnswerDTO> getActive(String username) {
+        Set<PhoneRepairRequest> phoneRepairRequests = phoneRepairRequestRepository.findByCustomerUsername(username)
+                .stream()
+                .filter(p -> p.getPhoneRepairs() == null)
+                .collect(Collectors.toSet());
+        return createPhoneRepairRequestAnswerDTOs(phoneRepairRequests);
+    }
+
+    @Override
+    public PhoneRepairRequestAnswerDTO getDetails(String idApp) {
+        return createPhoneRepairRequestAnswerDTO(phoneRepairRequestRepository.findByIdApp(idApp).get());
     }
 
     private PhoneRepairRequest savePhoto(String username, MultipartFile photo, PhoneRepairRequest phoneRepairRequest) throws IOException {
@@ -101,6 +117,31 @@ public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService 
     private String setLogoImageUrl(String username, String name) {
         return ServletUriComponentsBuilder.fromCurrentContextPath().
                 path(USER_IMAGE_PATH + username + FORWARD_SLASH + name + DOT + JPG_EXTENSION).toUriString();
+    }
+
+    private Set<PhoneRepairRequestAnswerDTO> createPhoneRepairRequestAnswerDTOs(Set<PhoneRepairRequest> phoneRepairRequests) {
+        Set<PhoneRepairRequestAnswerDTO> phoneRepairRequestAnswerDTOs = new HashSet<>();
+        phoneRepairRequests.forEach(p -> {
+            phoneRepairRequestAnswerDTOs.add(createPhoneRepairRequestAnswerDTO(p));
+        });
+        return phoneRepairRequestAnswerDTOs;
+    }
+
+    private PhoneRepairRequestAnswerDTO createPhoneRepairRequestAnswerDTO(PhoneRepairRequest p) {
+        PhoneRepairRequestAnswerDTO phoneRepairRequestAnswerDTO = new PhoneRepairRequestAnswerDTO();
+        phoneRepairRequestAnswerDTO.setPhoneNumber(p.getPhoneNumber());
+        phoneRepairRequestAnswerDTO.setIdApp(p.getIdApp());
+        phoneRepairRequestAnswerDTO.setCauseOfFailure(p.getCauseOfFailure());
+        phoneRepairRequestAnswerDTO.setDateOfRequestForPhoneRepair(p.getDateOfRequestForPhoneRepair());
+        phoneRepairRequestAnswerDTO.getPhotos()
+                .addAll(p.getPhotos().stream().map(Photo::getUrlPhoto).collect(Collectors.toSet()));
+        UserAnswerDTO userAnswerDTO = new UserAnswerDTO();
+        userAnswerDTO.setUsername(p.getCustomer().getUsername());
+        userAnswerDTO.setEmail(p.getCustomer().getEmail());
+        userAnswerDTO.setRole(p.getCustomer().getRole());
+        userAnswerDTO.setAuthorities(p.getCustomer().getAuthorities());
+        phoneRepairRequestAnswerDTO.setCustomer(userAnswerDTO);
+        return phoneRepairRequestAnswerDTO;
     }
 
     private String generateName() {

@@ -20,7 +20,11 @@ public class PhoneRepairRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @EqualsAndHashCode.Include
+    private String idApp;
+    @EqualsAndHashCode.Include
     private String phoneNumber;
+    @EqualsAndHashCode.Include
     private String causeOfFailure;
     @OneToMany(
             mappedBy = "phoneRepairRequest",
@@ -30,6 +34,7 @@ public class PhoneRepairRequest {
     private Set<Photo> photos = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
     private User customer;
+    @EqualsAndHashCode.Include
     private LocalDateTime dateOfRequestForPhoneRepair;
     @OneToMany(
             mappedBy = "phoneRepairRequest",
