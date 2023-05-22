@@ -21,13 +21,16 @@ public class PhoneRepair {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
+    @EqualsAndHashCode.Include
     private LocalDateTime dateOfAcceptanceOfTheRequest;
     @ManyToOne(fetch = FetchType.LAZY)
     private User engineer;
+    @EqualsAndHashCode.Include
+    private String status;
     @ManyToOne(fetch = FetchType.LAZY)
     private PhoneRepairRequest phoneRepairRequest;
-    private String status;
 //    @OneToMany(
 //            mappedBy = "phoneRepair",
 //            cascade = CascadeType.ALL,

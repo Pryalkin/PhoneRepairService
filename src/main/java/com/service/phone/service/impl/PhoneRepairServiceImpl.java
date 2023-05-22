@@ -12,6 +12,7 @@ import com.service.phone.model.for_phone.PhoneRepairRequest;
 import com.service.phone.model.for_phone.Photo;
 import com.service.phone.model.user.User;
 import com.service.phone.repository.PhoneRepairRepository;
+import com.service.phone.repository.PhoneRepairRequestRepository;
 import com.service.phone.service.PhoneRepairRequestService;
 import com.service.phone.service.PhoneRepairService;
 import com.service.phone.service.RoomService;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class PhoneRepairServiceImpl implements PhoneRepairService {
 
     private final PhoneRepairRequestService phoneRepairRequestService;
+    private final PhoneRepairRequestRepository phoneRepairRequestRepository;
     private final PhoneRepairRepository phoneRepairRepository;
     private final UserService userService;
     private final RoomService roomService;
@@ -36,13 +38,13 @@ public class PhoneRepairServiceImpl implements PhoneRepairService {
     @Override
     @Transactional
     public void registration(PhoneRepairDTO phoneRepairDTO) throws PhoneNumberDoesNotExistException, UsernameExistException {
-        PhoneRepairRequest phoneRepairRequest = phoneRepairRequestService.findByPhoneNumber(phoneRepairDTO.getPhoneNumber());
+        PhoneRepairRequest phoneRepairRequest = phoneRepairRequestRepository.findByIdApp(phoneRepairDTO.getIdApp()).get();
         User engineer = userService.findByUsername(phoneRepairDTO.getEngineer());
+        phoneRepairRequest.setStatus(Status.ACTIVE.name());
         PhoneRepair phoneRepair = new PhoneRepair();
-        phoneRepair.setPhoneRepairRequest(phoneRepairRequest);
-        phoneRepair.setEngineer(engineer);
         phoneRepair.setStatus(Status.ACTIVE.name());
-        phoneRepair = phoneRepairRepository.save(phoneRepair);
+        phoneRepair.setEngineer(engineer);
+        phoneRepairRequest.addPhoneRepair(phoneRepair);
         roomService.createRoom(phoneRepair);
     }
 

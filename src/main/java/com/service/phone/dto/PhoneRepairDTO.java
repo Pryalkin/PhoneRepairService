@@ -6,6 +6,6 @@ import lombok.Data;
 public class PhoneRepairDTO {
 
     private String engineer;
-    private String phoneNumber;
+    private String idApp;
 
 }

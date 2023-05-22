@@ -26,6 +26,7 @@ public class PhoneRepairRequest {
     private String phoneNumber;
     @EqualsAndHashCode.Include
     private String causeOfFailure;
+    private String status;
     @OneToMany(
             mappedBy = "phoneRepairRequest",
             cascade = CascadeType.ALL,

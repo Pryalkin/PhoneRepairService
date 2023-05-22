@@ -36,15 +36,15 @@ public class PhoneRepairController extends ExceptionHandling {
         return HttpAnswer.response(CREATED, APPLICATION_SUCCESSFULLY_ACCEPTED);
     }
 
-    @GetMapping("/get/for_customer")
-    public ResponseEntity<Set<PhoneRepairAnswerDTO>> getForCustomer(@RequestParam String username,
+    @GetMapping("/get/for_customer/{username}")
+    public ResponseEntity<Set<PhoneRepairAnswerDTO>> getForCustomer(@PathVariable String username,
                                                                     HttpServletRequest request) throws NoRightException {
         checkUsernameForValidity(request, jwtTokenProvider, username);
         return new ResponseEntity<>(phoneRepairService.getPhoneRepairForCustomer(username), OK);
     }
 
-    @GetMapping("/get/for_engineer")
-    public ResponseEntity<Set<PhoneRepairAnswerDTO>> getForEngineer(@RequestParam String username,
+    @GetMapping("/get/for_engineer/{username}")
+    public ResponseEntity<Set<PhoneRepairAnswerDTO>> getForEngineer(@PathVariable String username,
                                                                     HttpServletRequest request) throws NoRightException {
         checkUsernameForValidity(request, jwtTokenProvider, username);
         return new ResponseEntity<>(phoneRepairService.getPhoneRepairForEngineer(username), OK);

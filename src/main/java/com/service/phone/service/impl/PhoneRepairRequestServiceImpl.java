@@ -2,6 +2,7 @@ package com.service.phone.service.impl;
 
 import com.service.phone.dto.PhoneRepairRequestAnswerDTO;
 import com.service.phone.dto.UserAnswerDTO;
+import com.service.phone.enumeration.Status;
 import com.service.phone.exception.PhoneNumberDoesNotExistException;
 import com.service.phone.exception.UsernameExistException;
 import com.service.phone.model.for_phone.PhoneRepairRequest;
@@ -52,6 +53,7 @@ public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService 
         phoneRepairRequest.setIdApp(idApp);
         phoneRepairRequest.setCauseOfFailure(causeOfFailure);
         phoneRepairRequest.setCustomer(customer);
+        phoneRepairRequest.setStatus(Status.INACTIVE.name());
         phoneRepairRequest = savePhoto(username, photo1, phoneRepairRequest);
         phoneRepairRequest = savePhoto(username, photo2, phoneRepairRequest);
         phoneRepairRequest = savePhoto(username, photo3, phoneRepairRequest);
@@ -62,7 +64,7 @@ public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService 
     @Override
     public Set<PhoneRepairRequestAnswerDTO> getInactiveForEngineer() {
         Set<PhoneRepairRequest> phoneRepairRequests = phoneRepairRequestRepository.findAll()
-                .stream().filter(p -> p.getPhoneRepairs() != null)
+                .stream().filter(p -> p.getStatus().equals(Status.INACTIVE.name()))
                 .collect(Collectors.toSet());
         return createPhoneRepairRequestAnswerDTOs(phoneRepairRequests);
 
@@ -78,7 +80,7 @@ public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService 
     public Set<PhoneRepairRequestAnswerDTO> getInactive(String username) {
         Set<PhoneRepairRequest> phoneRepairRequests = phoneRepairRequestRepository.findByCustomerUsername(username)
                 .stream()
-                .filter(p -> p.getPhoneRepairs() != null)
+                .filter(p -> p.getStatus().equals(Status.INACTIVE.name()))
                 .collect(Collectors.toSet());
         return createPhoneRepairRequestAnswerDTOs(phoneRepairRequests);
     }
@@ -87,7 +89,7 @@ public class PhoneRepairRequestServiceImpl implements PhoneRepairRequestService 
     public Set<PhoneRepairRequestAnswerDTO> getActive(String username) {
         Set<PhoneRepairRequest> phoneRepairRequests = phoneRepairRequestRepository.findByCustomerUsername(username)
                 .stream()
-                .filter(p -> p.getPhoneRepairs() == null)
+                .filter(p -> p.getStatus().equals(Status.ACTIVE.name()))
                 .collect(Collectors.toSet());
         return createPhoneRepairRequestAnswerDTOs(phoneRepairRequests);
     }
