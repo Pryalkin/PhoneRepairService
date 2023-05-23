@@ -51,14 +51,44 @@ public class PhoneRepairServiceImpl implements PhoneRepairService {
     @Override
     public Set<PhoneRepairAnswerDTO> getPhoneRepairForCustomer(String username) {
         Set<PhoneRepair> phoneRepairs = phoneRepairRepository
-                .findByPhoneRepairRequestCustomerUsername(username).orElse(new HashSet<>());
+                .findByPhoneRepairRequestCustomerUsername(username).orElse(new HashSet<>())
+                .stream().filter(p -> p.getStatus().equals(Status.ACTIVE.name()))
+                .collect(Collectors.toSet());
         return createPhoneRepairAnswerDTOs(phoneRepairs);
     }
 
     @Override
     public Set<PhoneRepairAnswerDTO> getPhoneRepairForEngineer(String username) {
         Set<PhoneRepair> phoneRepairs = phoneRepairRepository
-                .findByEngineerUsername(username).orElse(new HashSet<>());
+                .findByEngineerUsername(username).orElse(new HashSet<>())
+                .stream().filter(p -> p.getStatus().equals(Status.ACTIVE.name()))
+                .collect(Collectors.toSet());
+        return createPhoneRepairAnswerDTOs(phoneRepairs);
+    }
+
+    @Override
+    public void ready(PhoneRepairDTO phoneRepairDTO) throws UsernameExistException {
+        PhoneRepair phoneRepair = phoneRepairRepository.findByPhoneRepairRequestIdApp(phoneRepairDTO.getIdApp()).get();
+        phoneRepair.getPhoneRepairRequest().setStatus(Status.READY.name());
+        phoneRepair.setStatus(Status.READY.name());
+        phoneRepairRepository.save(phoneRepair);
+    }
+
+    @Override
+    public Set<PhoneRepairAnswerDTO> getForCustomerOnReady(String username) {
+        Set<PhoneRepair> phoneRepairs = phoneRepairRepository
+                .findByPhoneRepairRequestCustomerUsername(username).orElse(new HashSet<>())
+                .stream().filter(p -> p.getStatus().equals(Status.READY.name()))
+                .collect(Collectors.toSet());
+        return createPhoneRepairAnswerDTOs(phoneRepairs);
+    }
+
+    @Override
+    public Set<PhoneRepairAnswerDTO> getForEngineerOnReady(String username) {
+        Set<PhoneRepair> phoneRepairs = phoneRepairRepository
+                .findByEngineerUsername(username).orElse(new HashSet<>())
+                .stream().filter(p -> p.getStatus().equals(Status.READY.name()))
+                .collect(Collectors.toSet());
         return createPhoneRepairAnswerDTOs(phoneRepairs);
     }
 

@@ -13,4 +13,10 @@ public interface PhoneRepairService {
     Set<PhoneRepairAnswerDTO> getPhoneRepairForCustomer(String username);
 
     Set<PhoneRepairAnswerDTO> getPhoneRepairForEngineer(String username);
+
+    void ready(PhoneRepairDTO phoneRepairDTO) throws UsernameExistException;
+
+    Set<PhoneRepairAnswerDTO> getForCustomerOnReady(String username);
+
+    Set<PhoneRepairAnswerDTO> getForEngineerOnReady(String username);
 }

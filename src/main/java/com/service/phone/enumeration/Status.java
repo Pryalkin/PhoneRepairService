@@ -5,5 +5,6 @@ public enum Status {
     ACTIVE,
     INACTIVE,
     CLOSED,
+    READY
 
 }

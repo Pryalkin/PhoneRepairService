@@ -50,5 +50,25 @@ public class PhoneRepairController extends ExceptionHandling {
         return new ResponseEntity<>(phoneRepairService.getPhoneRepairForEngineer(username), OK);
     }
 
+    @PostMapping("/ready")
+    public ResponseEntity<HttpResponse> ready(@RequestBody PhoneRepairDTO phoneRepairDTO) throws PhoneNumberDoesNotExistException, UsernameExistException {
+        phoneRepairService.ready(phoneRepairDTO);
+        return HttpAnswer.response(CREATED, APPLICATION_SUCCESSFULLY_ACCEPTED);
+    }
+
+    @GetMapping("/get/for_customer/on_ready/{username}")
+    public ResponseEntity<Set<PhoneRepairAnswerDTO>> getForCustomerOnReady(@PathVariable String username,
+                                                                    HttpServletRequest request) throws NoRightException {
+        checkUsernameForValidity(request, jwtTokenProvider, username);
+        return new ResponseEntity<>(phoneRepairService.getForCustomerOnReady(username), OK);
+    }
+
+    @GetMapping("/get/for_engineer/on_ready/{username}")
+    public ResponseEntity<Set<PhoneRepairAnswerDTO>> getForEngineerOnReady(@PathVariable String username,
+                                                                    HttpServletRequest request) throws NoRightException {
+        checkUsernameForValidity(request, jwtTokenProvider, username);
+        return new ResponseEntity<>(phoneRepairService.getForEngineerOnReady(username), OK);
+    }
+
 
 }

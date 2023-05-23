@@ -11,6 +11,7 @@ import java.util.Set;
 public interface PhoneRepairRepository extends JpaRepository<PhoneRepair, Long> {
 
     Optional<Set<PhoneRepair>> findByEngineerUsername(String username);
+    Optional<PhoneRepair> findByPhoneRepairRequestIdApp(String idApp);
     Optional<Set<PhoneRepair>> findByPhoneRepairRequestCustomerUsername(String username);
 
 }
